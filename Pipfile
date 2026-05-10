@@ -7,6 +7,7 @@ name = "pypi"
 django = "*"
 channels = {extras = ["types"], version = "*"}
 djangorestframework = "*"
+channels-redis = "*"
 
 [dev-packages]
 
