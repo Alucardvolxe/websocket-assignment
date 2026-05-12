@@ -1,21 +1,39 @@
 import json
 from channels.generic.websocket import WebsocketConsumer
-
+from django.contrib.auth.models import User
 from asgiref.sync import async_to_sync
 
 from .models import Message
 
 class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
-        messages = Message.last_10_messages(messages)
-
+        messages = Message.last_10_messages()
         content = {
+            'command': 'fetch_messages',       # ← add this
             'messages': self.messages_to_json(messages)
         }
+        self.send_message(content)
     
     def new_message(self, data):
-        print('new message')
-        
+        author = data.get('from') or ''   # handles both missing key AND None value
+        author = author.strip()
+
+        if not author:
+            self.send(text_data=json.dumps({'error': 'No username provided'}))
+            return
+
+        author_user, created = User.objects.get_or_create(username=author)
+
+        message = Message.objects.create(
+            author=author_user,
+            message=data['message'],
+            reaction=data.get('reaction', '')
+        )
+        content = {
+            'command': 'new_message',
+            'message': self.message_to_json(message)
+        }
+        return self.send_chat_message(content)
 
     def messages_to_json(self,messages):
         result =[]
@@ -27,11 +45,14 @@ class ChatConsumer(WebsocketConsumer):
 
     def message_to_json(self, message):
         return {
-            ''
+            'author':message.author.username,
+            'message':message.message,
+            'reaction':message.reaction,
+            'timestamp':str(message.timestamp)
         }
     commands = {
         'fetch_messages': fetch_messages,
-        'new_messages':new_message, 
+        'new_message':new_message, 
     }
      
 
@@ -69,6 +90,8 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
 
+    def send_message(self,message):
+        self.send(text_data=json.dumps({"message": message}))
     # Receive message from room group
     def chat_message(self, event):
         message = event["message"]

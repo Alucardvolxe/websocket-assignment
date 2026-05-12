@@ -39,7 +39,8 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user_name.username
+        return self.author.username
     
-    def last_10_messages(self):
+    @classmethod
+    def last_10_messages(cls):
         return Message.objects.order_by('-timestamp').all()[:10]

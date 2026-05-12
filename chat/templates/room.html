@@ -1,4 +1,4 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,45 +7,86 @@
 </head>
 <body>
     <textarea id="chat-log" cols="100" rows="20"></textarea><br>
-    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-input" type="text" size="100" placeholder="message"><br>
+   
+    <select id="reaction-select">
+        {% for value, label in reaction_choices %}
+            <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select><br>
+
     <input id="chat-message-submit" type="button" value="Send">
-    {{ room_name|json_script:"room-name" }}
-    <script>
-        const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-        const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/'
-            + roomName
-            + '/'
-        );
+        {{ room_name|json_script:"room-name" }}
 
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
-        };
+        <script src="{% static 'reconnecting-websocket.js' %}"></script>
+        <script>
+            const roomName = JSON.parse(document.getElementById('room-name').textContent);
+            const username = sessionStorage.getItem('chatUsername'); 
+            const chatLog = document.querySelector('#chat-log');
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.key === 'Enter') {  // enter, return
-                document.querySelector('#chat-message-submit').click();
+            if (!username) {
+                window.location.pathname = '/';
             }
-        };
 
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'commands':'fetch_messages'
-            }));
-            messageInputDom.value = '';
-        };
+            const chatSocket = new ReconnectingWebSocket(
+                'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+            );
+
+            let historyLoaded = false; 
+
+
+            chatSocket.onopen = function() {
+                if (!historyLoaded) {
+                    historyLoaded = true;
+                    chatLog.value = '';
+                    chatSocket.send(JSON.stringify({ 'commands': 'fetch_messages' }));
+                }
+            };
+
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                const msg = data.message;
+
+                if (msg.command === 'fetch_messages') {
+                    chatLog.value = '';
+                    msg.messages.reverse().forEach(m => {   
+                        const reaction = m.reaction ? ` [${m.reaction}]` : '';
+                        chatLog.value += `${m.author}: ${m.message}${reaction}\n`;
+                    });
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                } else if (msg.command === 'new_message') {
+                    const reaction = msg.message.reaction ? ` [${msg.message.reaction}]` : '';
+                    chatLog.value += `${msg.message.author}: ${msg.message.message}${reaction}\n`;
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+            };
+
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+                sessionStorage.removeItem('chatUsername');  // ← clear on disconnect
+            };
+
+            document.querySelector('#chat-message-input').focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e) {
+                if (e.key === 'Enter') document.querySelector('#chat-message-submit').click();
+            };
+
+            document.querySelector('#chat-message-submit').onclick = function(e) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const reactionDom = document.querySelector('#reaction-select');  // ← changed
+                const message = messageInputDom.value;
+                const reaction = reactionDom.value;                              // ← changed
+
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'reaction': reaction,
+                    'commands': 'new_message',
+                    'from': username
+                }));
+                messageInputDom.value = '';
+                reactionDom.value = '';
+            };
     </script>
 </body>
 </html>
