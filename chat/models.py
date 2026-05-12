@@ -3,36 +3,35 @@ from django.contrib.auth.models import User
 
 
 class Message(models.Model):
-    CONFUSED = '(◎_◎;)'
-    HAPPY = 'ヽ(•‿•)ノ'
-    EVIL = 'ψ(｀∇´)ψ'
-    RAGE = '(ノಠ益ಠ)ノ彡┻━┻'
-    TABLEV = '(╯°□°）╯︵ ┻━┻'
-    SHRUGGING = '┐(´д`)┌'
-    CUTE = '(づ｡◕‿‿◕｡)づ'
-    SIGMA = '(⌐■_■)'
-    FIGHT = 'ᕦ(ò_óˇ)ᕤ'
-    SUS = '(눈_눈)'
-    EXHAUSTED = '(-_-)'
-    EXTRA = '༼ つ ◕_◕ ༽つ'
+    HAPPY = '😄'
+    EVIL = '😈'
+    RAGE = '😡'
+    TABLEV = '🤬'
+    SHRUGGING = '🤷'
+    CUTE = '🥰'
+    SIGMA = '😎'
+    FIGHT = '💪'
+    SUS = '🤨'
+    EXHAUSTED = '😮‍💨'
+    EXTRA = '✨'
+    CONFUSED = '😵'
     NONE = ''
-    
-    REACTION_CHOICES = (
-    (CONFUSED, '(◎_◎;)'),
-    (HAPPY, 'ヽ(•‿•)ノ'),
-    (EVIL, 'ψ(｀∇´)ψ'),
-    (RAGE, '(ノಠ益ಠ)ノ彡┻━┻'),
-    (TABLEV, '(╯°□°）╯︵ ┻━┻'),
-    (SHRUGGING, '┐(´д`)┌'),
-    (CUTE, '(づ｡◕‿‿◕｡)づ'),
-    (SIGMA, '(⌐■_■)'),
-    (FIGHT, 'ᕦ(ò_óˇ)ᕤ'),
-    (SUS, '(눈_눈)'),
-    (EXHAUSTED, '(-_-)'),
-    (EXTRA, '༼ つ ◕_◕ ༽つ'),
-    (NONE, 'No Reaction')
-    )
 
+    REACTION_CHOICES = (
+        (CONFUSED, '😵 Confused'),
+        (HAPPY, '😄 Happy'),
+        (EVIL, '😈 Evil'),
+        (RAGE, '😡 Rage'),
+        (TABLEV, '🤬 Table Flip'),
+        (SHRUGGING, '🤷 Shrugging'),
+        (CUTE, '🥰 Cute'),
+        (SIGMA, '😎 Sigma'),
+        (FIGHT, '💪 Fight'),
+        (SUS, '🤨 Sus'),
+        (EXHAUSTED, '😮‍💨 Exhausted'),
+        (EXTRA, '✨ Extra'),
+        (NONE, 'No Reaction')
+    )
     author = models.ForeignKey(User,on_delete=models.CASCADE, related_name="author_message" )
     message= models.TextField()
     reaction= models.CharField(max_length = 50,choices=REACTION_CHOICES, default=NONE)

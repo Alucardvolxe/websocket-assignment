@@ -51,12 +51,12 @@
                 if (msg.command === 'fetch_messages') {
                     chatLog.value = '';
                     msg.messages.reverse().forEach(m => {   
-                        const reaction = m.reaction ? ` [${m.reaction}]` : '';
+                        const reaction = m.reaction ? ` ${m.reaction}` : '';
                         chatLog.value += `${m.author}: ${m.message}${reaction}\n`;
                     });
                     chatLog.scrollTop = chatLog.scrollHeight;
                 } else if (msg.command === 'new_message') {
-                    const reaction = msg.message.reaction ? ` [${msg.message.reaction}]` : '';
+                    const reaction = msg.message.reaction ? ` ${msg.message.reaction}` : '';
                     chatLog.value += `${msg.message.author}: ${msg.message.message}${reaction}\n`;
                     chatLog.scrollTop = chatLog.scrollHeight;
                 }
@@ -64,7 +64,7 @@
 
             chatSocket.onclose = function(e) {
                 console.error('Chat socket closed unexpectedly');
-                sessionStorage.removeItem('chatUsername');  // ← clear on disconnect
+                sessionStorage.removeItem('chatUsername');
             };
 
             document.querySelector('#chat-message-input').focus();
@@ -74,9 +74,9 @@
 
             document.querySelector('#chat-message-submit').onclick = function(e) {
                 const messageInputDom = document.querySelector('#chat-message-input');
-                const reactionDom = document.querySelector('#reaction-select');  // ← changed
+                const reactionDom = document.querySelector('#reaction-select'); 
                 const message = messageInputDom.value;
-                const reaction = reactionDom.value;                              // ← changed
+                const reaction = reactionDom.value;                              
 
                 chatSocket.send(JSON.stringify({
                     'message': message,
