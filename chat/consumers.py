@@ -9,13 +9,13 @@ class ChatConsumer(WebsocketConsumer):
     def fetch_messages(self, data):
         messages = Message.last_10_messages()
         content = {
-            'command': 'fetch_messages',       # ← add this
+            'command': 'fetch_messages',     
             'messages': self.messages_to_json(messages)
         }
         self.send_message(content)
     
     def new_message(self, data):
-        author = data.get('from') or ''   # handles both missing key AND None value
+        author = data.get('from') or ''   
         author = author.strip()
 
         if not author:
