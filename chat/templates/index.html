@@ -28,7 +28,7 @@
             if (!username) { alert('Please enter a username.'); return; }
             if (!roomName) { alert('Please enter a room name.'); return; }
             sessionStorage.setItem('chatUsername', username);
-            window.location.pathname = roomName + '/';
+             window.location.pathname = '/chat/' + roomName + '/';
         };
     </script>
 </body>

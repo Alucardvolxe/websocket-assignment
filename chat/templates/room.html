@@ -26,7 +26,7 @@
             const chatLog = document.querySelector('#chat-log');
 
             if (!username) {
-                window.location.pathname = '/';
+                window.location.pathname = '/chat/';
             }
 
             const chatSocket = new ReconnectingWebSocket(

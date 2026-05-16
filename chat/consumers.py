@@ -57,7 +57,7 @@ class ChatConsumer(WebsocketConsumer):
         
    
         self.room, created = Room.objects.get_or_create(room_name=self.room_name)
-        self.room_group_name = f"chat_{self.room_name}"  #
+        self.room_group_name = f"chat_{self.room_name}"  
 
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
