@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Room(models.Model):
+    id = models.AutoField(primary_key=True)
+    room_name= models.CharField(null=False, max_length=100)
+    created_at= models.DateTimeField(auto_now_add=True)
 
 class Message(models.Model):
     HAPPY = '😄'
@@ -36,6 +40,8 @@ class Message(models.Model):
     message= models.TextField()
     reaction= models.CharField(max_length = 50,choices=REACTION_CHOICES, default=NONE)
     timestamp = models.DateTimeField(auto_now_add=True)
+    room= models.ForeignKey(Room, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return self.author.username
