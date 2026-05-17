@@ -56,7 +56,7 @@
                     });
                     chatLog.scrollTop = chatLog.scrollHeight;
                 } else if (msg.command === 'new_message') {
-                    const reaction = msg.message.reaction ? ` ${msg.message.reaction}` : '';
+                    const reaction = msg.message.reaction ? `${msg.message.reaction}` : '';
                     chatLog.value += `${msg.message.author}: ${msg.message.message}${reaction}\n`;
                     chatLog.scrollTop = chatLog.scrollHeight;
                 }
