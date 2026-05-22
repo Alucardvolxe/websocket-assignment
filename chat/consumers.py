@@ -8,7 +8,7 @@ from .models import Message, Room
 class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
-        messages = Message.objects.filter(room=self.room).order_by('-timestamp')[:10]
+        messages = Message.objects.filter(room=self.room).order_by('-timestamp')
         content = {
             'command': 'fetch_messages',
             'messages': self.messages_to_json(messages)
@@ -65,7 +65,7 @@ class ChatConsumer(WebsocketConsumer):
         self.accept()
 
 
-        
+
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
