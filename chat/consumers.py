@@ -5,6 +5,8 @@ from asgiref.sync import async_to_sync
 
 from .models import Message, Room
 
+
+#To-do make users unique perchat-room
 class ChatConsumer(WebsocketConsumer):
 
     def fetch_messages(self, data):
